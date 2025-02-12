@@ -32,10 +32,10 @@ public class JobServiceImpl implements JobService{
 
     @Override
     public boolean deleteJobById(Long id) {
-        try {
+        if (jobRepository.existsById(id)) {
             jobRepository.deleteById(id);
             return true;
-        } catch (Exception e) {
+        } else {
             return false;
         }
     }
@@ -52,7 +52,8 @@ public class JobServiceImpl implements JobService{
             job.setLocation(updatedJob.getLocation());
             jobRepository.save(job);
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 }
