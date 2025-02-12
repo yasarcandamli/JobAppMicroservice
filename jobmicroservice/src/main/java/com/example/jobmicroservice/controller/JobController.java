@@ -51,8 +51,8 @@ public class JobController {
     @PutMapping("/{id}")
     public ResponseEntity<String> updateJob(@PathVariable Long id,
                                             @RequestBody Job updatedJob) {
-        boolean updated = jobService.updateJob(id, updatedJob);
-        if (updated) {
+        boolean isUpdated = jobService.updateJob(id, updatedJob);
+        if (isUpdated) {
             return new ResponseEntity<>("Job updated successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Job not found", HttpStatus.NOT_FOUND);
