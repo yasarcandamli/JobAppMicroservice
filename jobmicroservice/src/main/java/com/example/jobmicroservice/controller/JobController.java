@@ -1,5 +1,6 @@
 package com.example.jobmicroservice.controller;
 
+import com.example.jobmicroservice.dto.JobDTO;
 import com.example.jobmicroservice.entity.Job;
 import com.example.jobmicroservice.service.JobService;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ public class JobController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Job>> findAll() {
+    public ResponseEntity<List<JobDTO>> findAll() {
         return new ResponseEntity<>(jobService.findAll(), HttpStatus.OK);
     }
 
