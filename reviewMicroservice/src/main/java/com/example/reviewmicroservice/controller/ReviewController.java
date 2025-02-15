@@ -1,6 +1,7 @@
 package com.example.reviewmicroservice.controller;
 
 import com.example.reviewmicroservice.entity.Review;
+import com.example.reviewmicroservice.messaging.ReviewMessageProducer;
 import com.example.reviewmicroservice.service.ReviewService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +13,11 @@ import java.util.List;
 @RequestMapping("/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
+    private final ReviewMessageProducer reviewMessageProducer;
 
-    public ReviewController(ReviewService reviewService) {
+    public ReviewController(ReviewService reviewService, ReviewMessageProducer reviewMessageProducer) {
         this.reviewService = reviewService;
+        this.reviewMessageProducer = reviewMessageProducer;
     }
 
     @GetMapping
@@ -27,6 +30,7 @@ public class ReviewController {
                                                @RequestBody Review review) {
         boolean isReviewSaved = reviewService.createReview(companyId, review);
         if (isReviewSaved) {
+            reviewMessageProducer.sendMessage(review);
             return new ResponseEntity<>("Review added successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Review not saved", HttpStatus.NOT_FOUND);
@@ -57,5 +61,11 @@ public class ReviewController {
         } else {
             return new ResponseEntity<>("Review not found", HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/averageRating")
+    public Double getAverageRating(@RequestParam Long companyId) {
+        List<Review> reviewList = reviewService.findAll(companyId);
+        return reviewList.stream().mapToDouble(Review::getRating).average().orElse(0.0);
     }
 }

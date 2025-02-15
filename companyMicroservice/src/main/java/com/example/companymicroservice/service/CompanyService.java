@@ -1,5 +1,6 @@
 package com.example.companymicroservice.service;
 
+import com.example.companymicroservice.dto.ReviewMessage;
 import com.example.companymicroservice.entity.Company;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface CompanyService {
     boolean deleteCompanyById(Long id);
 
     boolean updateCompany(Long id, Company updatedCompany);
+
+    void updateCompanyRating(ReviewMessage reviewMessage);
 }
