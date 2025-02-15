@@ -8,6 +8,9 @@ import com.example.jobmicroservice.external.Company;
 import com.example.jobmicroservice.external.Review;
 import com.example.jobmicroservice.mapper.JobMapper;
 import com.example.jobmicroservice.repository.JobRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -36,10 +39,19 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+//    @CircuitBreaker(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
+//    @Retry(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
+    @RateLimiter(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
     public List<JobDTO> findAll() {
         List<Job> jobs = jobRepository.findAll();
 
         return jobs.stream().map(this::convertToDTO).toList();
+    }
+
+    public List<String> companyBreakerFallback(Exception e) {
+        List<String> list = new ArrayList<>();
+        list.add("Dummy Response");
+        return list;
     }
 
     @Override
