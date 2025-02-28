@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+data:
+  POSTGRES_DB: yasarcan
+  POSTGRES_USER: yasarcan
+  POSTGRES_PASSWORD: yasarcan
