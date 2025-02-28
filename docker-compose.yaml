@@ -9,7 +9,7 @@ services:
     volumes:
       - postgres:/data/postgres
     ports:
-      - "5433:5432"
+      - "5432:5432"
     networks:
       - postgres
     restart: unless-stopped
@@ -35,6 +35,7 @@ services:
     ports:
       - 9411:9411
     networks:
+      - microservice-network
       - postgres
 
   rabbitmq:
@@ -44,9 +45,78 @@ services:
       - 5672:5672
       - 15672:15672
     networks:
+      - microservice-network
       - postgres
 
+  servicereg:
+    image: yasarcandamli/servicereg:latest
+    container_name: servicereg
+    ports:
+      - "8761:8761"
+    depends_on:
+      - rabbitmq
+      - zipkin
+      - postgres
+      - pgadmin
+    networks:
+      - microservice-network
+      - postgres
+
+  company-microservice:
+    image: yasarcandamli/company-microservice:latest
+    container_name: company
+    ports:
+      - 8081:8081
+    depends_on:
+      - servicereg
+    networks:
+      - microservice-network
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  job-microservice:
+    image: yasarcandamli/job-microservice:latest
+    container_name: job
+    ports:
+      - 8082:8082
+    depends_on:
+      - servicereg
+    networks:
+      - microservice-network
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://servicereg:8761/eureka
+
+  review-microservice:
+    image: yasarcandamli/review-microservice:latest
+    container_name: review
+    ports:
+      - 8083:8083
+    depends_on:
+      - servicereg
+    networks:
+      - microservice-network
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  gateway-microservice:
+    image: yasarcandamli/gateway-microservice:latest
+    ports:
+      - 8084:8084
+    depends_on:
+      - servicereg
+    networks:
+      - microservice-network
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
 networks:
+  microservice-network:
+    driver: bridge
   postgres:
     driver: bridge
 
