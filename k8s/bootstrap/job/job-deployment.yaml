@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: job-microservice
+  labels:
+    app: job-microservice
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: job-microservice
+      labels:
+        app: job-microservice
+    spec:
+      containers:
+        - name: job-microservice
+          image: yasarcandamli/job-microservice:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8082
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: k8s
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Xmx256m -Xms128m"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: job-microservice
