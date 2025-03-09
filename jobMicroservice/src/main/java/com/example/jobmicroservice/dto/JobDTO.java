@@ -72,7 +72,6 @@ public class JobDTO {
         this.company = company;
     }
 
-
     public List<Review> getReviews() {
         return reviews;
     }
